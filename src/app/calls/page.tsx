@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import CallsTable from "@/components/CallsTable";
 
 export default async function CallsPage({
@@ -11,7 +12,9 @@ export default async function CallsPage({
   return (
     <div>
       <h1 className="text-2xl font-bold text-white mb-4">All Calls</h1>
-      <CallsTable initialFollowUpFilter={followUpFilter} />
+      <Suspense fallback={<div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="bg-zinc-900 border border-zinc-800 rounded-lg h-16 animate-pulse" />)}</div>}>
+        <CallsTable initialFollowUpFilter={followUpFilter} />
+      </Suspense>
     </div>
   );
 }

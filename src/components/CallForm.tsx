@@ -99,6 +99,9 @@ export default function CallForm({
         notes: form.notes || null,
         follow_up_at: form.follow_up_at ? mytLocalToISO(form.follow_up_at) : null,
         duration_seconds: form.duration_seconds,
+        called_at: null as string | null,
+        outcome_updated_at: null as string | null,
+        attempt_count: 0,
       };
       if (call) {
         const updated = await updateCall(call.id, data);

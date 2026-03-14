@@ -36,7 +36,9 @@ export default function Dashboard() {
       </div>
       <div>
         <h2 className="text-lg font-semibold text-white mb-3">Recent Calls</h2>
-        <CallsTable limit={5} />
+        <Suspense fallback={<div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="bg-zinc-900 border border-zinc-800 rounded-lg h-16 animate-pulse" />)}</div>}>
+          <CallsTable limit={5} />
+        </Suspense>
       </div>
       <MotivationWrapper />
     </div>
