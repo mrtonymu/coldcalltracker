@@ -115,8 +115,8 @@ export default function CallDetailPage() {
         {call.duration_seconds != null && (
           <Row label="Duration" value={formatDuration(call.duration_seconds)} />
         )}
-        {call.follow_up_date && (
-          <Row label="Follow-up" value={call.follow_up_date} highlight />
+        {call.follow_up_at && (
+          <Row label="Follow-up" value={formatDate(call.follow_up_at)} highlight />
         )}
       </div>
 
