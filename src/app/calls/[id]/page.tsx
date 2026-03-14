@@ -16,17 +16,23 @@ export default function CallDetailPage() {
   const callsUrl = filter ? `/calls?filter=${encodeURIComponent(filter)}` : "/calls";
   const [call, setCall] = useState<Call | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     getCall(id)
       .then(setCall)
+      .catch(() => setError("Failed to load call"))
       .finally(() => setLoading(false));
   }, [id]);
 
   if (loading) {
     return <div className="text-zinc-500">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-rose-400">{error}</div>;
   }
 
   if (!call) {

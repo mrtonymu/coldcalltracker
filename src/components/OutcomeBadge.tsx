@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 const colors: Record<string, string> = {
   no_answer: "bg-zinc-700 text-zinc-300",
   voicemail: "bg-blue-900 text-blue-300",
@@ -18,7 +20,7 @@ const labels: Record<string, string> = {
   whatsapp: "WhatsApp",
 };
 
-export default function OutcomeBadge({ outcome }: { outcome: string | null }) {
+function OutcomeBadge({ outcome }: { outcome: string | null }) {
   if (!outcome) return <span className="text-zinc-500 text-sm">—</span>;
   return (
     <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${colors[outcome] || "bg-zinc-700 text-zinc-300"}`}>
@@ -26,3 +28,5 @@ export default function OutcomeBadge({ outcome }: { outcome: string | null }) {
     </span>
   );
 }
+
+export default memo(OutcomeBadge);

@@ -1,14 +1,16 @@
 import Link from "next/link";
 import { getStats } from "@/lib/actions";
+import { Phone, BarChart3, Target, Clock } from "lucide-react";
+import { ReactNode } from "react";
 
 export default async function StatsCards() {
   const stats = await getStats();
 
-  const cards = [
-    { label: "Calls Today", value: stats.callsToday, icon: "📞", href: undefined },
-    { label: "This Week", value: stats.callsThisWeek, icon: "📊", href: undefined },
-    { label: "Conversion", value: `${stats.conversionRate}%`, icon: "🎯", href: undefined },
-    { label: "Follow-ups Due", value: stats.followUpsDue, icon: "⏰", href: "/calls?followup=today" },
+  const cards: { label: string; value: string | number; icon: ReactNode; href?: string }[] = [
+    { label: "Calls Today", value: stats.callsToday, icon: <Phone className="w-4 h-4" /> },
+    { label: "This Week", value: stats.callsThisWeek, icon: <BarChart3 className="w-4 h-4" /> },
+    { label: "Conversion", value: `${stats.conversionRate}%`, icon: <Target className="w-4 h-4" /> },
+    { label: "Follow-ups Due", value: stats.followUpsDue, icon: <Clock className="w-4 h-4" />, href: "/calls?followup=today" },
   ];
 
   return (
@@ -17,7 +19,7 @@ export default async function StatsCards() {
         const inner = (
           <>
             <div className="flex items-center gap-2 text-zinc-400 text-sm mb-1">
-              <span>{card.icon}</span>
+              {card.icon}
               <span>{card.label}</span>
             </div>
             <div className="text-3xl font-bold text-white">{card.value}</div>

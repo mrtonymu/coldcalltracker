@@ -7,6 +7,7 @@ export default function SettingsPage() {
   const [goal, setGoal] = useState("50");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     getSetting("daily_goal").then((v) => {
@@ -19,12 +20,13 @@ export default function SettingsPage() {
     const n = parseInt(goal, 10);
     if (isNaN(n) || n < 1) return;
     setSaving(true);
+    setSaveError(null);
     try {
       await setSetting("daily_goal", String(n));
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch {
-      alert("Failed to save settings");
+      setSaveError("Failed to save settings");
     } finally {
       setSaving(false);
     }
@@ -58,6 +60,9 @@ export default function SettingsPage() {
         >
           {saved ? "Saved!" : saving ? "Saving..." : "Save Settings"}
         </button>
+        {saveError && (
+          <p className="text-rose-400 text-sm">{saveError}</p>
+        )}
       </form>
     </div>
   );

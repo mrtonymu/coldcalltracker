@@ -7,6 +7,7 @@ import { getCalls } from "@/lib/actions";
 import { Call } from "@/lib/supabase";
 import OutcomeBadge from "./OutcomeBadge";
 import { formatMYT } from "@/lib/timezone";
+import { ClipboardList, CheckCircle, RefreshCw, CheckCheck } from "lucide-react";
 
 const outcomeFilters = [
   { value: "", label: "All" },
@@ -96,7 +97,7 @@ export default function CallsTable({
           <input
             type="text"
             placeholder="Search contacts, companies, phones..."
-            className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-3 sm:py-2 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -106,7 +107,7 @@ export default function CallsTable({
                 type="button"
                 key={f.value}
                 onClick={() => setOutcomeFilter(f.value)}
-                className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                className={`px-3 py-2 sm:px-2.5 sm:py-1.5 rounded-md text-xs font-medium transition-colors ${
                   outcomeFilter === f.value
                     ? "bg-emerald-600 text-white"
                     : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
@@ -118,7 +119,8 @@ export default function CallsTable({
             <button
               type="button"
               onClick={() => setOver1Min((v) => !v)}
-              className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              aria-label="Filter calls longer than 1 minute"
+              className={`px-3 py-2 sm:px-2.5 sm:py-1.5 rounded-md text-xs font-medium transition-colors ${
                 over1Min
                   ? "bg-blue-600 text-white"
                   : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
@@ -129,7 +131,8 @@ export default function CallsTable({
             <button
               type="button"
               onClick={() => setFollowUpFilter((v) => !v)}
-              className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              aria-label="Filter today's follow-ups"
+              className={`px-3 py-2 sm:px-2.5 sm:py-1.5 rounded-md text-xs font-medium transition-colors ${
                 followUpFilter
                   ? "bg-amber-600 text-white"
                   : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
@@ -141,7 +144,7 @@ export default function CallsTable({
               <button
                 type="button"
                 onClick={clearFilters}
-                className="px-2.5 py-1.5 rounded-md text-xs font-medium text-zinc-500 hover:text-white transition-colors"
+                className="px-3 py-2 sm:px-2.5 sm:py-1.5 rounded-md text-xs font-medium text-zinc-500 hover:text-white transition-colors"
               >
                 ✕ Clear
               </button>
@@ -180,8 +183,8 @@ export default function CallsTable({
               {needsRetry.length > 0 && (
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
-                      🔁 Needs Retry
+                    <span className="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1">
+                      <RefreshCw className="w-3.5 h-3.5" /> Needs Retry
                     </span>
                     <span className="text-xs text-zinc-600 bg-zinc-800 px-2 py-0.5 rounded-full">
                       {needsRetry.length}
@@ -194,8 +197,8 @@ export default function CallsTable({
               {retried.length > 0 && (
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
-                      ✅ Second Attempt
+                    <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1">
+                      <CheckCheck className="w-3.5 h-3.5" /> Second Attempt
                     </span>
                     <span className="text-xs text-zinc-600 bg-zinc-800 px-2 py-0.5 rounded-full">
                       {retried.length}
@@ -219,8 +222,8 @@ export default function CallsTable({
               {pending.length > 0 && (
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
-                      📋 Not Yet Called
+                    <span className="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1">
+                      <ClipboardList className="w-3.5 h-3.5" /> Not Yet Called
                     </span>
                     <span className="text-xs text-zinc-600 bg-zinc-800 px-2 py-0.5 rounded-full">
                       {pending.length}
@@ -234,7 +237,7 @@ export default function CallsTable({
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
-                      ✅ Called
+                      <CheckCircle className="w-3.5 h-3.5 inline" /> Called
                     </span>
                     <span className="text-xs text-zinc-600 bg-zinc-800 px-2 py-0.5 rounded-full">
                       {called.length}

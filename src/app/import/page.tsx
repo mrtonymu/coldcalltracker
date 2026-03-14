@@ -62,7 +62,8 @@ export default function ImportPage() {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      const text = e.target?.result as string;
+      const result = e.target?.result;
+      const text = typeof result === 'string' ? result : '';
       const parsed = parseCSV(text);
       setRows(parsed);
     };

@@ -104,8 +104,7 @@ export async function setSetting(key: string, value: string): Promise<void> {
 }
 
 export async function getDailyGoalData() {
-  const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+  const todayStart = getMytTodayRange().start;
 
   const [goalRes, qualifiedRes] = await Promise.all([
     supabase.from("settings").select("value").eq("key", "daily_goal").single(),
@@ -162,7 +161,7 @@ export async function getAnalyticsData(days: number) {
 
 export async function getMotivationData() {
   const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+  const todayStart = getMytTodayRange().start;
   const thirtyDaysAgo = new Date(now);
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -262,10 +261,14 @@ export async function getExistingPhones(): Promise<Set<string>> {
 }
 
 export async function getStats() {
-  const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-  const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay()).toISOString();
-  const { start: followStart, end: followEnd } = getMytTodayRange();
+  const { start: todayStart, end: followEnd } = getMytTodayRange();
+  const followStart = todayStart;
+  // Calculate week start (Sunday) relative to MYT today
+  const mytTodayDate = new Date(todayStart);
+  const mytDay = mytTodayDate.getDay();
+  const weekStartDate = new Date(mytTodayDate.getTime() - mytDay * 24 * 60 * 60 * 1000);
+  const weekStartDateStr = weekStartDate.toISOString().split("T")[0];
+  const weekStart = `${weekStartDateStr}T00:00:00+08:00`;
 
   const [todayRes, weekRes, allRes, followUpRes] = await Promise.all([
     supabase.from("calls").select("id", { count: "exact" }).not("called_at", "is", null).gte("called_at", todayStart),
