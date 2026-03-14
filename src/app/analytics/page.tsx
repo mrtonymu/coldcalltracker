@@ -105,7 +105,7 @@ export default function AnalyticsPage() {
                   tickFormatter={(d: string) => d.slice(5)}
                 />
                 <YAxis tick={tickStyle} allowDecimals={false} />
-                <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [v, "Calls"]} labelStyle={{ color: "#f4f4f5" }} itemStyle={{ color: "#d4d4d8" }} />
+                <Tooltip contentStyle={tooltipStyle} formatter={(v) => [String(v), "Calls"]} labelStyle={{ color: "#f4f4f5" }} itemStyle={{ color: "#d4d4d8" }} />
                 <Line
                   type="monotone"
                   dataKey="count"
@@ -137,7 +137,7 @@ export default function AnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
                   <XAxis dataKey="label" tick={tickStyle} />
                   <YAxis tick={tickStyle} allowDecimals={false} />
-                  <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [v, "Calls"]} labelStyle={{ color: "#f4f4f5" }} itemStyle={{ color: "#d4d4d8" }} />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(v) => [String(v), "Calls"]} labelStyle={{ color: "#f4f4f5" }} itemStyle={{ color: "#d4d4d8" }} />
                   <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                     {data.outcomeDistribution.map((entry, i) => (
                       <Cell key={i} fill={outcomeColors[entry.outcome] || "#71717a"} />
