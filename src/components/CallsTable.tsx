@@ -384,9 +384,9 @@ function CallRows({
       <div className="sm:hidden space-y-2">
         {calls.map((call) => (
           <div key={call.id} className="relative">
-            <Link
-              href={`/calls/${call.id}`}
-              className="block bg-zinc-900 border border-zinc-800 rounded-lg p-4 active:bg-zinc-800 transition-colors"
+            <div
+              onClick={() => router.push(`/calls/${call.id}${outcomeFilter ? `?filter=${encodeURIComponent(outcomeFilter)}` : ""}`)}
+              className="block bg-zinc-900 border border-zinc-800 rounded-lg p-4 active:bg-zinc-800 transition-colors cursor-pointer"
             >
               <div className="flex items-start justify-between">
                 <div>
@@ -420,7 +420,7 @@ function CallRows({
                   </span>
                 )}
               </div>
-            </Link>
+            </div>
             {showQuickLog && (
               <Link
                 href={`/calls/new?name=${encodeURIComponent(call.contact_name)}&company=${encodeURIComponent(call.company || "")}&phone=${encodeURIComponent(call.phone || "")}`}
