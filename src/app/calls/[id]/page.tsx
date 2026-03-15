@@ -7,17 +7,21 @@ import { getCall, deleteCall } from "@/lib/actions";
 import { Call } from "@/lib/supabase";
 import OutcomeBadge from "@/components/OutcomeBadge";
 import CallForm from "@/components/CallForm";
+import { useActiveCall } from "@/contexts/ActiveCallContext";
+import { Phone } from "lucide-react";
 
 export default function CallDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
   const filter = searchParams.get("filter");
+  const durationParam = searchParams.get("duration");
   const callsUrl = filter ? `/calls?filter=${encodeURIComponent(filter)}` : "/calls";
+  const { startCall, activeCall } = useActiveCall();
   const [call, setCall] = useState<Call | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(!!durationParam);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
@@ -75,6 +79,7 @@ export default function CallDetailPage() {
         <h1 className="text-2xl font-bold text-white mb-6">Edit Call</h1>
         <CallForm
           call={call}
+          prefillDuration={durationParam ? parseInt(durationParam, 10) : undefined}
           onSaved={() => {
             router.push(callsUrl);
             router.refresh();
@@ -103,7 +108,20 @@ export default function CallDetailPage() {
             )}
           </h1>
           {call.company && <p className="text-zinc-400 mt-0.5">{call.company}</p>}
-          {call.phone && <p className="text-zinc-500 text-sm mt-0.5">{call.phone}</p>}
+          {call.phone && (
+            <a
+              href={`tel:${call.phone}`}
+              onClick={() => {
+                if (!activeCall || activeCall.callId !== call.id) {
+                  startCall(call.id, call.contact_name);
+                }
+              }}
+              className="inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-emerald-400 transition-colors mt-0.5"
+            >
+              <Phone className="w-3.5 h-3.5" />
+              {call.phone}
+            </a>
+          )}
         </div>
         <OutcomeBadge outcome={call.outcome} />
       </div>

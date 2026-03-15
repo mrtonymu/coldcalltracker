@@ -43,6 +43,11 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
+/* Safe area for iPhone notch/home bar */
+.safe-area-bottom {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+
 /* Dark date input */
 input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(1);

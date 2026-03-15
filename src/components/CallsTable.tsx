@@ -7,7 +7,8 @@ import { getCalls } from "@/lib/actions";
 import { Call } from "@/lib/supabase";
 import OutcomeBadge from "./OutcomeBadge";
 import { formatMYT } from "@/lib/timezone";
-import { ClipboardList, CheckCircle, RefreshCw, CheckCheck } from "lucide-react";
+import { ClipboardList, CheckCircle, RefreshCw, CheckCheck, Phone } from "lucide-react";
+import { useActiveCall } from "@/contexts/ActiveCallContext";
 
 const outcomeFilters = [
   { value: "", label: "All" },
@@ -168,7 +169,7 @@ export default function CallsTable({
         </div>
       ) : limit ? (
         // Dashboard: flat list (recent calls)
-        <CallRows calls={calls} router={router} formatDate={formatDate} outcomeFilter={outcomeFilter} />
+        <CallRows calls={calls} router={router} formatDate={formatDate} outcomeFilter={outcomeFilter} showPhone />
       ) : outcomeFilter === "no_answer,voicemail" ? (
         // Retry view: split into needs retry / already retried
         (() => {
@@ -254,17 +255,40 @@ export default function CallsTable({
   );
 }
 
+function PhoneLink({ phone, callId, contactName }: { phone: string; callId: string; contactName: string }) {
+  const { startCall, activeCall } = useActiveCall();
+  const isActive = activeCall?.callId === callId;
+
+  return (
+    <a
+      href={`tel:${phone}`}
+      onClick={(e) => {
+        e.stopPropagation();
+        if (!isActive) startCall(callId, contactName);
+      }}
+      className={`inline-flex items-center gap-1 text-xs hover:text-emerald-400 transition-colors ${
+        isActive ? "text-emerald-400" : "text-zinc-500"
+      }`}
+    >
+      <Phone className="w-3 h-3" />
+      {phone}
+    </a>
+  );
+}
+
 function CallRows({
   calls,
   router,
   formatDate,
   showQuickLog,
+  showPhone,
   outcomeFilter,
 }: {
   calls: Call[];
   router: ReturnType<typeof import("next/navigation").useRouter>;
   formatDate: (d: string) => string;
   showQuickLog?: boolean;
+  showPhone?: boolean;
   outcomeFilter?: string;
 }) {
   return (
@@ -298,7 +322,9 @@ function CallRows({
                       <span className="text-xs text-zinc-500 ml-1.5">({formatAttempt(call.attempt_count)})</span>
                     )}
                   </div>
-                  {call.phone && <div className="text-xs text-zinc-500">{call.phone}</div>}
+                  {call.phone && (
+                    <PhoneLink phone={call.phone} callId={call.id} contactName={call.contact_name} />
+                  )}
                 </td>
                 <td className="py-3 pr-4 text-zinc-400 text-sm">{call.company || "—"}</td>
                 <td className="py-3 pr-4"><OutcomeBadge outcome={call.outcome} /></td>
@@ -370,7 +396,12 @@ function CallRows({
                       <span className="text-xs text-zinc-500 ml-1.5">({formatAttempt(call.attempt_count)})</span>
                     )}
                   </div>
-                  <div className="text-xs text-zinc-500">{call.company || ""} {call.phone ? `· ${call.phone}` : ""}</div>
+                  <div className="text-xs text-zinc-500">
+                    {call.company || ""}
+                    {call.phone && (
+                      <> · <PhoneLink phone={call.phone} callId={call.id} contactName={call.contact_name} /></>
+                    )}
+                  </div>
                 </div>
                 <OutcomeBadge outcome={call.outcome} />
               </div>

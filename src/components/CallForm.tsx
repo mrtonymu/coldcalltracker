@@ -26,10 +26,12 @@ type Prefill = {
 export default function CallForm({
   call,
   prefill,
+  prefillDuration,
   onSaved,
 }: {
   call?: Call;
   prefill?: Prefill;
+  prefillDuration?: number;
   onSaved?: (updated: Call) => void;
 }) {
   const router = useRouter();
@@ -41,13 +43,13 @@ export default function CallForm({
     outcome: call?.outcome || "",
     notes: call?.notes || "",
     follow_up_at: call?.follow_up_at ? isoToMytLocal(call.follow_up_at) : "",
-    duration_seconds: call?.duration_seconds ?? (null as number | null),
+    duration_seconds: prefillDuration ?? call?.duration_seconds ?? (null as number | null),
   });
 
   // Timer state
   const [timerRunning, setTimerRunning] = useState(false);
-  const [timerSeconds, setTimerSeconds] = useState(0);
-  const [timerStopped, setTimerStopped] = useState(false);
+  const [timerSeconds, setTimerSeconds] = useState(prefillDuration ?? 0);
+  const [timerStopped, setTimerStopped] = useState(!!prefillDuration);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {

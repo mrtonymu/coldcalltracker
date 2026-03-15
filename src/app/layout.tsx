@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import FollowUpNotificationInit from "@/components/FollowUpNotificationInit";
+import { ActiveCallProvider } from "@/contexts/ActiveCallContext";
+import ActiveCallBar from "@/components/ActiveCallBar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -22,9 +24,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} font-sans antialiased`}>
-        <Navbar />
-        <FollowUpNotificationInit />
-        <main className="max-w-5xl mx-auto px-4 py-6">{children}</main>
+        <ActiveCallProvider>
+          <Navbar />
+          <FollowUpNotificationInit />
+          <main className="max-w-5xl mx-auto px-4 py-6">{children}</main>
+          <ActiveCallBar />
+        </ActiveCallProvider>
       </body>
     </html>
   );
