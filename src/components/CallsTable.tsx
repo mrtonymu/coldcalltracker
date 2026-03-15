@@ -84,6 +84,7 @@ export default function CallsTable({
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString("en-US", {
+      timeZone: "Asia/Kuala_Lumpur",
       month: "short",
       day: "numeric",
       hour: "2-digit",

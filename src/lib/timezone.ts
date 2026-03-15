@@ -20,12 +20,31 @@ export function formatMYT(isoString: string): string {
   });
 }
 
+/** Get the current MYT date string (YYYY-MM-DD) */
+export function getMytDateStr(): string {
+  const mytMs = Date.now() + MYT_OFFSET_MS;
+  return new Date(mytMs).toISOString().split("T")[0];
+}
+
 /** Get today's MYT date range as ISO strings for Supabase queries */
 export function getMytTodayRange(): { start: string; end: string } {
-  const mytMs = Date.now() + MYT_OFFSET_MS;
-  const mytToday = new Date(mytMs).toISOString().split("T")[0];
+  const mytToday = getMytDateStr();
   return {
     start: `${mytToday}T00:00:00+08:00`,
     end: `${mytToday}T23:59:59+08:00`,
   };
+}
+
+/** Get the day of week (0=Sun) for a MYT date string (YYYY-MM-DD) */
+export function getMytDayOfWeek(dateStr: string): number {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  // Use UTC noon to avoid any DST/timezone shifts
+  return new Date(Date.UTC(y, m - 1, d, 12)).getUTCDay();
+}
+
+/** Get a MYT date string offset by N days from a base date string */
+export function offsetMytDate(dateStr: string, days: number): string {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d + days, 12));
+  return dt.toISOString().split("T")[0];
 }

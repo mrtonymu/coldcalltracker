@@ -29,7 +29,7 @@ export default function ActiveCallBar() {
   if (!activeCall) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-emerald-600 text-white px-4 py-3 safe-area-bottom">
+    <div className="fixed bottom-14 sm:bottom-0 left-0 right-0 z-50 bg-emerald-600 text-white px-4 py-3 sm:safe-area-bottom">
       <div className="max-w-5xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0">
           <span className="relative flex h-3 w-3 shrink-0">

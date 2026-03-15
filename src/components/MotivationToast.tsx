@@ -15,7 +15,7 @@ export default function MotivationToast({ content, onDismiss }: Props) {
   }, [onDismiss]);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 max-w-sm animate-slide-up">
+    <div className="fixed bottom-20 sm:bottom-6 right-4 left-4 sm:left-auto sm:right-6 z-50 max-w-sm animate-slide-up">
       <div className="bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl p-4 flex items-start gap-3">
         <span className="text-2xl leading-none mt-0.5">{content.emoji}</span>
         <div className="flex-1 min-w-0">

@@ -1,5 +1,5 @@
 import { supabase, Call } from "./supabase";
-import { getMytTodayRange } from "./timezone";
+import { getMytTodayRange, getMytDateStr, getMytDayOfWeek, offsetMytDate } from "./timezone";
 
 export async function getCalls(
   search?: string,
@@ -104,7 +104,7 @@ export async function setSetting(key: string, value: string): Promise<void> {
 }
 
 export async function getDailyGoalData() {
-  const todayStart = getMytTodayRange().start;
+  const { start: todayStart, end: todayEnd } = getMytTodayRange();
 
   const [goalRes, qualifiedRes] = await Promise.all([
     supabase.from("settings").select("value").eq("key", "daily_goal").single(),
@@ -113,6 +113,7 @@ export async function getDailyGoalData() {
       .select("id", { count: "exact" })
       .not("called_at", "is", null)
       .gte("called_at", todayStart)
+      .lte("called_at", todayEnd)
       .gte("duration_seconds", 60),
   ]);
 
@@ -123,15 +124,15 @@ export async function getDailyGoalData() {
 }
 
 export async function getAnalyticsData(days: number) {
-  const since = new Date();
-  since.setDate(since.getDate() - days + 1);
-  since.setHours(0, 0, 0, 0);
+  const mytToday = getMytDateStr();
+  const sinceDate = offsetMytDate(mytToday, -(days - 1));
+  const sinceISO = `${sinceDate}T00:00:00+08:00`;
 
   const { data, error } = await supabase
     .from("calls")
     .select("called_at, outcome")
     .not("called_at", "is", null)
-    .gte("called_at", since.toISOString());
+    .gte("called_at", sinceISO);
 
   if (error) throw error;
   const calls = data || [];
@@ -139,12 +140,13 @@ export async function getAnalyticsData(days: number) {
   // Daily trend: fill every day with 0, then count
   const dailyMap = new Map<string, number>();
   for (let i = 0; i < days; i++) {
-    const d = new Date(since);
-    d.setDate(d.getDate() + i);
-    dailyMap.set(d.toISOString().split("T")[0], 0);
+    dailyMap.set(offsetMytDate(sinceDate, i), 0);
   }
   calls.forEach((c) => {
-    const date = (c.called_at as string).split("T")[0];
+    // Extract MYT date from called_at by converting to MYT
+    const utcMs = new Date(c.called_at as string).getTime();
+    const mytMs = utcMs + 8 * 60 * 60 * 1000;
+    const date = new Date(mytMs).toISOString().split("T")[0];
     dailyMap.set(date, (dailyMap.get(date) || 0) + 1);
   });
   const dailyTrend = Array.from(dailyMap.entries()).map(([date, count]) => ({ date, count }));
@@ -261,20 +263,19 @@ export async function getExistingPhones(): Promise<Set<string>> {
 }
 
 export async function getStats() {
-  const { start: todayStart, end: followEnd } = getMytTodayRange();
-  const followStart = todayStart;
-  // Calculate week start (Sunday) relative to MYT today
-  const mytTodayDate = new Date(todayStart);
-  const mytDay = mytTodayDate.getDay();
-  const weekStartDate = new Date(mytTodayDate.getTime() - mytDay * 24 * 60 * 60 * 1000);
-  const weekStartDateStr = weekStartDate.toISOString().split("T")[0];
+  const { start: todayStart, end: todayEnd } = getMytTodayRange();
+  // Calculate week start (Monday) relative to MYT today using timezone-safe helpers
+  const mytToday = getMytDateStr();
+  const mytDay = getMytDayOfWeek(mytToday); // 0=Sun, 1=Mon, ...
+  const daysToMonday = mytDay === 0 ? 6 : mytDay - 1; // Mon=0 back, Tue=1 back, Sun=6 back
+  const weekStartDateStr = offsetMytDate(mytToday, -daysToMonday);
   const weekStart = `${weekStartDateStr}T00:00:00+08:00`;
 
   const [todayRes, weekRes, allRes, followUpRes] = await Promise.all([
-    supabase.from("calls").select("id", { count: "exact" }).not("called_at", "is", null).gte("called_at", todayStart),
-    supabase.from("calls").select("id", { count: "exact" }).not("called_at", "is", null).gte("called_at", weekStart),
+    supabase.from("calls").select("id", { count: "exact" }).not("called_at", "is", null).gte("called_at", todayStart).lte("called_at", todayEnd),
+    supabase.from("calls").select("id", { count: "exact" }).not("called_at", "is", null).gte("called_at", weekStart).lte("called_at", todayEnd),
     supabase.from("calls").select("outcome").not("called_at", "is", null),
-    supabase.from("calls").select("id", { count: "exact" }).not("follow_up_at", "is", null).gte("follow_up_at", followStart).lte("follow_up_at", followEnd),
+    supabase.from("calls").select("id", { count: "exact" }).not("follow_up_at", "is", null).gte("follow_up_at", todayStart).lte("follow_up_at", todayEnd),
   ]);
 
   const allCalls = allRes.data || [];

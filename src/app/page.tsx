@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Suspense } from "react";
 import StatsCards from "@/components/StatsCards";
 import DailyGoalCard from "@/components/DailyGoalCard";

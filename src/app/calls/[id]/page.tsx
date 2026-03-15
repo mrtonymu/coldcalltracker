@@ -51,6 +51,7 @@ export default function CallDetailPage() {
 
   const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleString("en-US", {
+      timeZone: "Asia/Kuala_Lumpur",
       weekday: "short",
       year: "numeric",
       month: "short",
